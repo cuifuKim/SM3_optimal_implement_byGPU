@@ -7,7 +7,7 @@ SM3 was published in December 2007 by the Chinese National Cryptographic Adminis
 SM3 uses a Merkle-Damgard construction like MD4, MD5, SHA-1 and SHA-2. SM means commercial cipher. 
 
 
-  *Macros and data types
+  *Macros and data types  
 #define R(v,n)(((v)<<(n))|((v)>>(32-(n))))
 #define F(n)for(i=0;i<n;i++)
 
@@ -28,7 +28,7 @@ typedef struct _sm3_ctx {
     Q len;
 }sm3_ctx;
 
- **Initialization
+ **Initialization  
  void sm3_init(sm3_ctx*c) {    
     c->s[0]=0x7380166f;
     c->s[1]=0x4914b2b9;
@@ -41,7 +41,7 @@ typedef struct _sm3_ctx {
     c->len =0;
 }
 
- ***Updating context
+ ***Updating context  
  Updating the buffer and state is exactly the same as SHA-2 that is based on the original design for MD4 by Ron Rivest. 
  Once the buffer has 64-bytes of data, it's processed using sm3_compress.
  void sm3_update(sm3_ctx*c,const void*in,W len) {
@@ -60,7 +60,7 @@ typedef struct _sm3_ctx {
     }
 }
 
- ****Finalization
+ ****Finalization  
  This step is also the exact same as SHA-2.
  void sm3_final(void*h,sm3_ctx*c) {
     W i,len,*p=h;
@@ -78,7 +78,7 @@ typedef struct _sm3_ctx {
     F(8)p[i]=rev32(c->s[i]);
 }
 
- *****Compression
+ *****Compression  
  void sm3_compress(sm3_ctx*c) {
     W t1,t2,i,j,t,s1,s2,x[8],w[68];
 
