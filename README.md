@@ -1,3 +1,15 @@
+# SM3 implementation and optimization
+## SM3 algorithm overview
+SM3 cryptographic hash algorithm is the Chinese commercial cryptographic hash algorithm standard published by China National cryptographic administration in 2010. The algorithm was published as the cryptographic industry standard (gm/t 0004-2012) in 2012 and the national cryptographic hash algorithm standard (gb/t32905-2016) in 2016.  
+SM3 is suitable for digital signature and verification in commercial cryptographic applications. It is an improved algorithm based on SHA-256, and its security is equivalent to SHA-256. The iterative process of Sm3 and MD5 is similar, and the Merkle damgard structure is also adopted. The message packet length is 512 bits, and the summary value length is 256 bits.  
+### Message population
+The message expansion step of Sm3 takes 512 bit data packets as input. Therefore, we need to fill the data length to a multiple of 512 bits at the beginning.  
+### Message extension
+The filled messages are grouped by 512 bits. First, a 512 bit data packet is divided into 16 message words. It is expanded from 16 message words to 132 message words.  
+### Compression function
+Omit. Please check the original literature for details  
+
+
 ---
 ## SM3_optimal_implement_byGPU  
 SM3's optimal implement by using GPU  
