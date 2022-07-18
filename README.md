@@ -68,33 +68,29 @@ unsigned int *ReverseWord(unsigned int *word){
 }
 ```
 ### Message filling: 
-Fill the data length to a multiple of 512 bits.  
+Fill the data length to a multiple of 512 bits.The length takes up 8 bytes according to the big end method, and only the length within 2^32 - 1 (unit: bit) is considered, * so the higher 4 bytes are assigned to 0.  
 ```c++
-/* 填充消息分组，并处理 */
 	bitLen = messageLen * 8;
 	if (IsLittleEndian())
 		ReverseWord(&bitLen);
 	memcpy(context.messageBlock, message + i * 64, remainder);
-	context.messageBlock[remainder] = 0x80;//添加bit‘0x1000 0000’到末尾
-	if (remainder <= 55)//如果剩下的bit数少于440
-	{
-		/* 长度按照大端法占8个字节，只考虑长度在 2**32 - 1（单位：比特）以内的情况，
-		* 故将高 4 个字节赋为 0 。*/
+	context.messageBlock[remainder] = 0x80;//Add bit '0x1000 0000' to the end
+	if (remainder <= 55){//If the number of bits left is less than 440
+
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
-		hash_rate += 1;//计算最后一个短块
+		hash_rate += 1;//Calculate the last short block
 		SM3ProcessMessageBlock(&context);
 	}
 	else
 	{
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
-		hash_rate += 1;//计算短块
+		hash_rate += 1;
 		SM3ProcessMessageBlock(&context);
-		/* 长度按照大端法占8个字节，只考虑长度在 2**32 - 1（单位：比特）以内的情况，
-		* 故将高 4 个字节赋为 0 。*/
+		
 		memset(context.messageBlock, 0, 64 - 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
-		hash_rate += 1;//计算最后一个短块
+		hash_rate += 1;//Calculate the last short block
 		SM3ProcessMessageBlock(&context);
 	}
 ```
