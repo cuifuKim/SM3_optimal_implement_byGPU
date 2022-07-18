@@ -45,6 +45,64 @@ unsigned int GG(unsigned int X, unsigned int Y, unsigned int Z, int i){//GG
 	else				return 0;
 }
 ```
+### Permutation function P0/P1
+```c++
+unsigned int P0(unsigned int X):	return X ^ LeftRotate(X,  9) ^ LeftRotate(X, 17);
+unsigned int P1(unsigned int X):	return X ^ LeftRotate(X, 15) ^ LeftRotate(X, 23);
+```
+
+### Reverse byte
+In SM3 algorithm, words are stored in big endian format, so bytes should be inverted.  
+```c++
+unsigned int *ReverseWord(unsigned int *word){
+	unsigned char *byte, temp;
+	byte = (unsigned char *)word;
+	temp = byte[0];
+	byte[0] = byte[3];
+	byte[3] = temp;
+
+	temp = byte[1];
+	byte[1] = byte[2];
+	byte[2] = temp;
+	return word;
+}
+```
+### Message filling: 
+Fill the data length to a multiple of 512 bits.  
+```c++
+/* 填充消息分组，并处理 */
+	bitLen = messageLen * 8;
+	if (IsLittleEndian())
+		ReverseWord(&bitLen);
+	memcpy(context.messageBlock, message + i * 64, remainder);
+	context.messageBlock[remainder] = 0x80;//添加bit‘0x1000 0000’到末尾
+	if (remainder <= 55)//如果剩下的bit数少于440
+	{
+		/* 长度按照大端法占8个字节，只考虑长度在 2**32 - 1（单位：比特）以内的情况，
+		* 故将高 4 个字节赋为 0 。*/
+		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
+		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
+		hash_rate += 1;//计算最后一个短块
+		SM3ProcessMessageBlock(&context);
+	}
+	else
+	{
+		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
+		hash_rate += 1;//计算短块
+		SM3ProcessMessageBlock(&context);
+		/* 长度按照大端法占8个字节，只考虑长度在 2**32 - 1（单位：比特）以内的情况，
+		* 故将高 4 个字节赋为 0 。*/
+		memset(context.messageBlock, 0, 64 - 4);
+		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
+		hash_rate += 1;//计算最后一个短块
+		SM3ProcessMessageBlock(&context);
+	}
+```
+
+
+
+
+
 
 ---
 ## SM3_optimal_implement_byGPU  
