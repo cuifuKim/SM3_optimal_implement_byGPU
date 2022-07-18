@@ -134,7 +134,6 @@ for (i = 0; i < 64; i++)	W_[i] = W[i] ^ W[i + 4];
 	context->intermediateHash[2] ^= C;	context->intermediateHash[3] ^= D;
 	context->intermediateHash[4] ^= E;	context->intermediateHash[5] ^= F;
 	context->intermediateHash[6] ^= G;	context->intermediateHash[7] ^= H;
-}
 ```
 ## SM3 algorithm optimization
 ### Optimization direction One: Rapid implementation of message expansion
