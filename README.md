@@ -76,27 +76,53 @@ Fill the data length to a multiple of 512 bits.The length takes up 8 bytes accor
 	memcpy(context.messageBlock, message + i * 64, remainder);
 	context.messageBlock[remainder] = 0x80;//Add bit '0x1000 0000' to the end
 	if (remainder <= 55){//If the number of bits left is less than 440
-
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
 		hash_rate += 1;//Calculate the last short block
 		SM3ProcessMessageBlock(&context);
 	}
-	else
-	{
+	else{
 		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
 		hash_rate += 1;
 		SM3ProcessMessageBlock(&context);
-		
 		memset(context.messageBlock, 0, 64 - 4);
 		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
 		hash_rate += 1;//Calculate the last short block
 		SM3ProcessMessageBlock(&context);
 	}
 ```
+### Message extend
+```c++
 
+```
 
+### Compress function
+```c++
+	A = context->intermediateHash[0];	B = context->intermediateHash[1];
+	C = context->intermediateHash[2];	D = context->intermediateHash[3];
+	E = context->intermediateHash[4];	F = context->intermediateHash[5];
+	G = context->intermediateHash[6];	H = context->intermediateHash[7];
+	
+	for (i = 0; i < 64; i++){
+		unsigned int SS3;
+		SS1 = LeftRotate((LeftRotate(A, 12) + E + LeftRotate(T(i), i)), 7);
+		SS2 = SS1 ^ LeftRotate(A, 12);
+		TT1 = FF(A, B, C, i) + D + SS2 + W_[i];
+		TT2 = GG(E, F, G, i) + H + SS1 + W[i];
 
+		D = C;				C = LeftRotate(B, 9);
+		B = A;				A = TT1;
+		H = G;				G = LeftRotate(F, 19);
+		F = E;				E = TT2 ^ LeftRotate(TT2, 9) ^ LeftRotate(TT2, 17);
+	}
+	
+	context->intermediateHash[0] ^= A;	context->intermediateHash[1] ^= B;
+	context->intermediateHash[2] ^= C;	context->intermediateHash[3] ^= D;
+	context->intermediateHash[4] ^= E;	context->intermediateHash[5] ^= F;
+	context->intermediateHash[6] ^= G;	context->intermediateHash[7] ^= H;
+}
+
+```
 
 
 
