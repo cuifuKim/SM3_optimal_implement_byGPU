@@ -1,4 +1,5 @@
-# SM3_optimal_implement_byGPU  
+---
+## SM3_optimal_implement_byGPU  
 SM3's optimal implement by using GPU  
 SM3 is 256-bit cryptographic hash algorithm derived from SHA-2 designed by the NSA.   
 It was designed by Xiaoyun Wang who is responsible for discovering attacks against many cryptographic hash functions, most notably MD5 and SHA-1. 
@@ -30,7 +31,7 @@ typedef struct _sm3_ctx {
 }sm3_ctx;  
 ```
 
- **Initialization    
+ ### Initialization    
  ```python
  void sm3_init(sm3_ctx*c) {    
     c->s[0]=0x7380166f;  
@@ -44,7 +45,7 @@ typedef struct _sm3_ctx {
     c->len =0;  
 }  
 ```
- ***Updating context    
+### Updating context    
  Updating the buffer and state is exactly the same as SHA-2 that is based on the original design for MD4 by Ron Rivest.   
  Once the buffer has 64-bytes of data, it's processed using sm3_compress.  
 ```python
@@ -64,7 +65,7 @@ typedef struct _sm3_ctx {
     }  
 }  
 ```
- ****Finalization  
+### Finalization  
  This step is also the exact same as SHA-2.
 ```python
  void sm3_final(void*h,sm3_ctx*c) {
@@ -83,7 +84,7 @@ typedef struct _sm3_ctx {
     F(8)p[i]=rev32(c->s[i]);
 }
 ```
- *****Compression  
+### Compression  
 ```python
  void sm3_compress(sm3_ctx*c) {
     W t1,t2,i,j,t,s1,s2,x[8],w[68];
