@@ -1,5 +1,9 @@
 # SM3 implementation and optimization
 ## Efficiency comparison
+<br>
+<center>
+<img src="Comparison.png" width="695" height="479">
+</center>
 
 ---
 ## SM3 algorithm overview
