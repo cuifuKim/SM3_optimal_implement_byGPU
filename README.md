@@ -70,29 +70,37 @@ unsigned int *ReverseWord(unsigned int *word){
 ### Message filling: 
 Fill the data length to a multiple of 512 bits.The length takes up 8 bytes according to the big end method, and only the length within 2^32 - 1 (unit: bit) is considered, * so the higher 4 bytes are assigned to 0.  
 ```c++
-	bitLen = messageLen * 8;
-	if (IsLittleEndian())
-		ReverseWord(&bitLen);
-	memcpy(context.messageBlock, message + i * 64, remainder);
-	context.messageBlock[remainder] = 0x80;//Add bit '0x1000 0000' to the end
-	if (remainder <= 55){//If the number of bits left is less than 440
-		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
-		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
-		hash_rate += 1;//Calculate the last short block
-		SM3ProcessMessageBlock(&context);
-	}
-	else{
-		memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
-		hash_rate += 1;
-		SM3ProcessMessageBlock(&context);
-		memset(context.messageBlock, 0, 64 - 4);
-		memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
-		hash_rate += 1;//Calculate the last short block
-		SM3ProcessMessageBlock(&context);
-	}
+bitLen = messageLen * 8;
+if (IsLittleEndian())
+	ReverseWord(&bitLen);
+memcpy(context.messageBlock, message + i * 64, remainder);
+context.messageBlock[remainder] = 0x80;//Add bit '0x1000 0000' to the end
+if (remainder <= 55){//If the number of bits left is less than 440
+	memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1 - 8 + 4);
+	memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
+	hash_rate += 1;//Calculate the last short block
+	SM3ProcessMessageBlock(&context);
+}
+else{
+	memset(context.messageBlock + remainder + 1, 0, 64 - remainder - 1);
+	hash_rate += 1;
+	SM3ProcessMessageBlock(&context);
+	memset(context.messageBlock, 0, 64 - 4);
+	memcpy(context.messageBlock + 64 - 4, &bitLen, 4);
+	hash_rate += 1;//Calculate the last short block
+	SM3ProcessMessageBlock(&context);
+}
 ```
 ### Message extend
 ```c++
+for (i = 0; i < 16; i++){
+	W[i] = *(unsigned int *)(context->messageBlock + i * 4);
+	if (IsLittleEndian())		ReverseWord(W + i);
+}
+for (i = 16; i < 68; i++)
+	W[i] = (W[i - 16] ^ W[i - 9] ^ LeftRotate(W[i - 3], 15)) ^ LeftRotate((W[i - 16] ^ W[i - 9] ^ LeftRotate(W[i - 3], 15)), 15) ^ LeftRotate((W[i - 16] ^ W[i - 9] ^ LeftRotate(W[i - 3], 15)), 23)^ LeftRotate(W[i - 13], 7)^ W[i - 6];
+			
+for (i = 0; i < 64; i++)	W_[i] = W[i] ^ W[i + 4];
 
 ```
 
@@ -121,8 +129,8 @@ Fill the data length to a multiple of 512 bits.The length takes up 8 bytes accor
 	context->intermediateHash[4] ^= E;	context->intermediateHash[5] ^= F;
 	context->intermediateHash[6] ^= G;	context->intermediateHash[7] ^= H;
 }
-
 ```
+## SM3 algorithm optimization
 
 
 
