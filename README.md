@@ -1,4 +1,7 @@
 # SM3 implementation and optimization
+## Efficiency comparison
+
+---
 ## SM3 algorithm overview
 SM3 cryptographic hash algorithm is the Chinese commercial cryptographic hash algorithm standard published by China National cryptographic administration in 2010. The algorithm was published as the cryptographic industry standard (gm/t 0004-2012) in 2012 and the national cryptographic hash algorithm standard (gb/t32905-2016) in 2016.  
 SM3 is suitable for digital signature and verification in commercial cryptographic applications. It is an improved algorithm based on SHA-256, and its security is equivalent to SHA-256. The iterative process of Sm3 and MD5 is similar, and the Merkle damgard structure is also adopted. The message packet length is 512 bits, and the summary value length is 256 bits.  
