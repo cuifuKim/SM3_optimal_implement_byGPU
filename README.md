@@ -9,6 +9,29 @@ The filled messages are grouped by 512 bits. First, a 512 bit data packet is div
 ### Compression function
 Omit. Please check the original literature for details  
 
+## SM3 algorithm implementation (original)
+### Initialization function
+```c++
+void SM3Init(SM3::SM3Context *context) {
+	context->intermediateHash[0] = 0x7380166F;
+	context->intermediateHash[1] = 0x4914B2B9;
+	context->intermediateHash[2] = 0x172442D7;
+	context->intermediateHash[3] = 0xDA8A0600;
+	context->intermediateHash[4] = 0xA96F30BC;
+	context->intermediateHash[5] = 0x163138AA;
+	context->intermediateHash[6] = 0xE38DEE4D;
+	context->intermediateHash[7] = 0xB0FB0E4E;
+}
+```
+### Constant vector T
+```c++
+unsigned int T(int i){
+	if (i >= 0 && i <= 15)          return 0x79CC4519;
+	else if (i >= 16 && i <= 63)    return 0x7A879D8A;
+	else                            return 0;
+}
+```
+
 
 ---
 ## SM3_optimal_implement_byGPU  
