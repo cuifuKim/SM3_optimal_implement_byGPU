@@ -53,7 +53,7 @@ __device__ W R(W v,int n){
   return r;
 }
 
-__device__ void sm3_compress(sm3_ctx *c) {
+__device__ void sm3_compress(sm3_ctx *c){
     W t1,t2,i,t,s1,s2,x[8],w[68];
 
     F(16)w[i]=rev32(c->x.w[i]);
@@ -73,7 +73,7 @@ __device__ void sm3_compress(sm3_ctx *c) {
     F(8)c->s[i]^=x[i];
 }
 
-__device__  void sm3_init(sm3_ctx *c) {    
+__device__  void sm3_init(sm3_ctx *c){    
     c->s[0]=0x7380166f; c->s[1]=0x4914b2b9;
     c->s[2]=0x172442d7; c->s[3]=0xda8a0600;
     c->s[4]=0xa96f30bc; c->s[5]=0x163138aa;
@@ -81,7 +81,7 @@ __device__  void sm3_init(sm3_ctx *c) {
     c->len =0;
 }
 
-__device__  void sm3_update(sm3_ctx *c, const void *in, W len) {
+__device__  void sm3_update(sm3_ctx *c, const void *in, W len){
     B *p=(B*)in;
     W i, idx;
     idx = c->len & 63;
@@ -96,48 +96,31 @@ __device__  void sm3_update(sm3_ctx *c, const void *in, W len) {
     }
 }
 
-__device__ void sm3_final(void *out, sm3_ctx *c) {
+__device__ void sm3_final(void *out, sm3_ctx *c){
     W i,len,*p=(W*)out;
-    
-    // get index
     i = len = c->len & 63;
-    // zero remainder of buffer
-    while(i < 64) c->x.b[i++]=0;
-    // add 1 bit
-    c->x.b[len]=0x80;
+    while(i < 64) c->x.b[i++]=0;    c->x.b[len]=0x80;
     
-    // exceeds or equals area for total bits?
     if(len >= 56) {
-      // compress it
       sm3_compress(c);
-      // zero buffer
       F(16)c->x.w[i]=0;
     }
-    // add total length in bits
+
     c->x.q[7]=rev64(c->len*8);
-    // compress it
     sm3_compress(c);
-    // return hash
     F(8)p[i]=rev32(c->s[i]);
 }
 
-
-//compare 256bit integer (32 byte)
-__device__
-int isLessThan(const unsigned char* a, const unsigned char* b, int num_bytes){      
+__device__ int isLessThan(const unsigned char* a, const unsigned char* b, int num_bytes){      
   for( int i = 0; i < num_bytes; i++){
-    if(*(a+i) < *(b+i))
-      return 1;
-    else if (*(a+i) > *(b+i))
-      return 0;
-    else
-      continue;
+    if(*(a+i) < *(b+i))         return 1;
+    else if (*(a+i) > *(b+i))   return 0;
+    else                        continue;
   }
   return 0;
 }
 
-__device__
-void hash2(const char* a, int msg_len,int b, unsigned char* out){  
+__device__ void hash2(const char* a, int msg_len,int b, unsigned char* out){  
   int len_a = msg_len;
   int len_b = sizeof(b);
   sm3_ctx c;  
@@ -147,9 +130,8 @@ void hash2(const char* a, int msg_len,int b, unsigned char* out){
   sm3_final(out, &c);
 }
 
-
-__global__ 
-void gpu_sm3(void* d_m, int len_m ,unsigned char* d_h){
+//Impor**
+__global__ void gpu_sm3(void* d_m, int len_m ,unsigned char* d_h){
   int i = blockIdx.x*blockDim.x + threadIdx.x;
 
   if (i == 0){
@@ -160,19 +142,13 @@ void gpu_sm3(void* d_m, int len_m ,unsigned char* d_h){
   }
 }
 
-
 __device__ bool found_flag = false;
 __device__ int valid_nounce = -1;
 
-
-
-__global__
-void find_valid_nounce(int n, const unsigned char* boundry, const char* msg, int msg_len){
+__global__ void find_valid_nounce(int n, const unsigned char* boundry, const char* msg, int msg_len){
   int nounce = blockIdx.x*blockDim.x + threadIdx.x;
-  //printf("nounce is %d\n", nounce);
   if(nounce < n){
     if(!found_flag){
-      //int valid =  dev_valid_nounce(nounce, boundry, msg, msg_len);    
       unsigned char hash_out[32];  
       hash2(msg, msg_len, nounce, hash_out);
       int valid = isLessThan(hash_out, boundry, 32);  
@@ -186,7 +162,6 @@ void find_valid_nounce(int n, const unsigned char* boundry, const char* msg, int
 }
 
 void host_find_valid_nounce(Q N, const unsigned char* boundry, const char* msg){
-  
   int msg_len = strlen(msg);  
 
   clock_t begin = clock();
@@ -196,7 +171,6 @@ void host_find_valid_nounce(Q N, const unsigned char* boundry, const char* msg){
   volatile bool found = false;
 
   int error;
-
   error = cudaMalloc(&d_boundry, 32*sizeof(char));   
   error = cudaMalloc(&d_msg, strlen(msg)*sizeof(unsigned char)); 
 
@@ -204,26 +178,13 @@ void host_find_valid_nounce(Q N, const unsigned char* boundry, const char* msg){
   memcpyStatus =cudaMemcpy(d_boundry, boundry, 32*sizeof(unsigned char), cudaMemcpyHostToDevice);  
   memcpyStatus =cudaMemcpy(d_msg, msg,strlen(msg)*sizeof(char), cudaMemcpyHostToDevice);
   
-  
   find_valid_nounce<<<(N+BLOCK_SIZE-1)/BLOCK_SIZE, BLOCK_SIZE>>>(N, d_boundry, d_msg,  msg_len);
   
   int answer;
   cudaMemcpyFromSymbol(&answer, valid_nounce, sizeof(answer), 0, cudaMemcpyDeviceToHost);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;  
-  if (answer == -1){
-    printf("cannot find valid nounce for the message %s\n", msg);
-  }
-  else
-    printf("The valid nounce for %s is %d\n", msg, answer);
+  if (answer == -1)    printf("cannot find valid nounce for the message %s\n", msg);
+  else                 printf("The valid nounce for %s is %d\n", msg, answer);
   printf("time spentd is %f\n", time_spent);
 }
-
-
-
-// int main(){
-//   cpu_find_valid_nounce();
-//   return 0;
-//   // test_gpu_sm3_working_fine();
-//   // return 0;  
-// }
