@@ -31,7 +31,20 @@ unsigned int T(int i){
 	else                            return 0;
 }
 ```
+### Boolen function
+```c++
+unsigned int FF(unsigned int X, unsigned int Y, unsigned int Z, int i){//FF
+	if (i >= 0 && i <= 15)		return X ^ Y ^ Z;
+	else if (i >= 16 && i <= 63)	return (X & Y) | (X & Z) | (Y & Z);
+	else				return 0;
+}
 
+unsigned int GG(unsigned int X, unsigned int Y, unsigned int Z, int i){//GG
+	if (i >= 0 && i <= 15)		return X ^ Y ^ Z;
+	else if (i >= 16 && i <= 63)	return (X & Y) | (~X & Z);
+	else				return 0;
+}
+```
 
 ---
 ## SM3_optimal_implement_byGPU  
