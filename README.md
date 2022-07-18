@@ -144,13 +144,8 @@ for (i = 0; i < 64; i++)	W_[i] = W[i] ^ W[i + 4];
 ---
 ## Optimization direction Five: GPU's parallel optimization of GPU(It cannot be well combined with the above directions for the time being and It seems a little superfluous.)
 ## SM3_optimal_implement_byGPU  Special column
-SM3's optimal implement by using GPU  
-SM3 is 256-bit cryptographic hash algorithm derived from SHA-2 designed by the NSA.   
+SM3's optimal implement by using GPU. SM3 is 256-bit cryptographic hash algorithm derived from SHA-2 designed by the NSA.   
 It was designed by Xiaoyun Wang who is responsible for discovering attacks against many cryptographic hash functions, most notably MD5 and SHA-1. 
-
-At the CRYPTO 2004 conference, she and co-authors demonstrated collision attacks against MD5 and SHA-0. Attacks against SHA-1 were published later in 2005. 
-SM3 was published in December 2007 by the Chinese National Cryptographic Administration Bureau as part of the Trusted Computing framework in China.  
-SM3 uses a Merkle-Damgard construction like MD4, MD5, SHA-1 and SHA-2. SM means commercial cipher. 
 
 ```python
 *Macros and data types  
