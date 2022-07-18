@@ -78,8 +78,7 @@ unsigned int *ReverseWord(unsigned int *word){
 Fill the data length to a multiple of 512 bits.The length takes up 8 bytes according to the big end method, and only the length within 2^32 - 1 (unit: bit) is considered, * so the higher 4 bytes are assigned to 0.  
 ```c++
 bitLen = messageLen * 8;
-if (IsLittleEndian())
-	ReverseWord(&bitLen);
+if (IsLittleEndian())	ReverseWord(&bitLen);
 memcpy(context.messageBlock, message + i * 64, remainder);
 context.messageBlock[remainder] = 0x80;//Add bit '0x1000 0000' to the end
 if (remainder <= 55){//If the number of bits left is less than 440
