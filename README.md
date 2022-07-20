@@ -142,8 +142,7 @@ for (i = 0; i < 64; i++)	W_[i] = W[i] ^ W[i + 4];
 ### Optimization direction Four: Optimize the generation process of intermediate variables of compression function
 
 ---
-## Optimization direction Five: GPU's parallel optimization of GPU(It cannot be well combined with the above directions for the time being and It seems a little superfluous.)
-## SM3_optimal_implement_byGPU  Special column
+### Optimization direction Five: GPU's parallel optimization of GPU(It cannot be well combined with the above directions for the time being and It seems a little superfluous.)
 SM3's optimal implement by using GPU. SM3 is 256-bit cryptographic hash algorithm derived from SHA-2 designed by the NSA.   
 It was designed by Xiaoyun Wang who is responsible for discovering attacks against many cryptographic hash functions, most notably MD5 and SHA-1. 
 
