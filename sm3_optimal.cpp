@@ -6,8 +6,8 @@ unsigned int hash_rate = 0;//Total message block
 unsigned int t[64];//Calculate the value of constant T in advance for storage
 
 static const int endianTest = 1;/*Determine whether the operating environment is a small end*/
-#define IsLittleEndian() (*(char *)&endianTest == 1)
 
+#define IsLittleEndian() (*(char *)&endianTest == 1)
 #define LeftRotate(word, bits) ( (word) << (bits) | (word) >> (32 - (bits)) )//Left cyclic shift
 
 unsigned int *ReverseWord(unsigned int *word){//Reverse four byte integer byte order
@@ -31,7 +31,6 @@ unsigned int T(int i){
 	else	return 0;
 }
 
-
 void caculT(){//Precalculate
 	for (int i = 0; i < 64; i++)	t[i] = LeftRotate(T(i),i);
 	return ;
@@ -50,9 +49,7 @@ unsigned int GG(unsigned int X, unsigned int Y, unsigned int Z, int i){
 }
 
 unsigned int P0(unsigned int X):	return X ^ LeftRotate(X, 9) ^ LeftRotate(X, 17);//P0
-
 unsigned int P1(unsigned int X):	return X ^ LeftRotate(X, 15) ^ LeftRotate(X, 23);//P1
-
 
 void SM3Init(SM3::SM3Context *context) {//initial function
 	context->intermediateHash[0] = 0x7380166F;	context->intermediateHash[1] = 0x4914B2B9;
@@ -61,32 +58,21 @@ void SM3Init(SM3::SM3Context *context) {//initial function
 	context->intermediateHash[6] = 0xE38DEE4D;	context->intermediateHash[7] = 0xB0FB0E4E;
 }
 
-
-/*新的一轮压缩算法*/
-void one_round(int i,unsigned int &A, unsigned int &B, unsigned int &C, unsigned int &D,
-	unsigned int &E, unsigned int &F, unsigned int &G, unsigned int &H, unsigned int W[68],SM3::SM3Context *context)
-{
+void one_round(int i,unsigned int &A, unsigned int &B, unsigned int &C, unsigned int &D,unsigned int &E, unsigned int &F, unsigned int &G, unsigned int &H, unsigned int W[68],SM3::SM3Context *context){//new compress func
 	unsigned int SS1 = 0, SS2 = 0, TT1 = 0, TT2 = 0;
-	//计算消息扩展字Wi+4
 	if (i < 12) {
 		W[i+4] = *(unsigned int *)(context->messageBlock + (i+4) * 4);
-		if (IsLittleEndian())
-			ReverseWord(W + i + 4);
+		if (IsLittleEndian())	ReverseWord(W + i + 4);
 	}
-	else {
-		/*P1*/
-		W[i+4] = ((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 15) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 23))
-			^ LeftRotate(W[i - 9], 7)
-			^ W[i - 2];
-		}
+	else 	W[i+4] = ((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 15) ^ LeftRotate((W[i - 12] ^ W[i - 5] ^ LeftRotate(W[i + 1], 15)), 23))^ LeftRotate(W[i - 9], 7)^ W[i - 2];
 
-	//计算中间变量TT1和TT2
+	//cal mid val TT1 and TT2
 	TT2 = LeftRotate(A, 12);
 	TT1 = TT2 + E + t[i];
 	TT1 = LeftRotate(TT1, 7);
 	TT2 ^= TT1;
 
-	//仅更新字寄存器B、D、F、H
+	//only update byte register B、D、F、H
 	D = D + FF(A, B, C, i) + TT2 + (W[i] ^ W[i + 4]);
 	H = H + GG(E, F, G, i) + TT1 + W[i];
 	B = LeftRotate(B, 9);
@@ -94,9 +80,7 @@ void one_round(int i,unsigned int &A, unsigned int &B, unsigned int &C, unsigned
 	H = H ^ LeftRotate(H, 9) ^ LeftRotate(H, 17);
 }
 
-/* 处理消息块*/
-void SM3ProcessMessageBlock(SM3::SM3Context *context)
-{
+void SM3ProcessMessageBlock(SM3::SM3Context *context){
 	int i;
 	unsigned int W[68];
 	//A-H是8个字寄存器
