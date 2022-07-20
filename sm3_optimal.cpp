@@ -83,44 +83,27 @@ void one_round(int i,unsigned int &A, unsigned int &B, unsigned int &C, unsigned
 void SM3ProcessMessageBlock(SM3::SM3Context *context){
 	int i;
 	unsigned int W[68];
-	//A-H是8个字寄存器
 	unsigned int A, B, C, D, E, F, G, H;
 
-	/* 消息扩展 */
-
-	for (i = 0; i < 4; i++)
-	{
+	for (i = 0; i < 4; i++)	{
 		W[i] = *(unsigned int *)(context->messageBlock + i * 4);
-		if (IsLittleEndian())
-			ReverseWord(W + i);
-		//        printf("%d: %x\n", i, W[i]);
+		if (IsLittleEndian())	ReverseWord(W + i);
 	}
 
-	/* 消息压缩 */
-	A = context->intermediateHash[0];
-	B = context->intermediateHash[1];
-	C = context->intermediateHash[2];
-	D = context->intermediateHash[3];
-	E = context->intermediateHash[4];
-	F = context->intermediateHash[5];
-	G = context->intermediateHash[6];
-	H = context->intermediateHash[7];
-	for (i = 0; i <= 60; i+=4)
-	{
+	A = context->intermediateHash[0];	B = context->intermediateHash[1];
+	C = context->intermediateHash[2];	D = context->intermediateHash[3];
+	E = context->intermediateHash[4];	F = context->intermediateHash[5];
+	G = context->intermediateHash[6];	H = context->intermediateHash[7];
+	for (i = 0; i <= 60; i+=4){
 		one_round(i, A, B, C, D, E, F, G, H, W, context);
 		one_round(i+1, D, A, B, C, H, E, F, G, W, context);
 		one_round(i+2, C, D, A, B, G, H, E, F, W, context);
 		one_round(i+3, B, C, D, A, F, G, H, E, W, context);
-
 	}
-	context->intermediateHash[0] ^= A;
-	context->intermediateHash[1] ^= B;
-	context->intermediateHash[2] ^= C;
-	context->intermediateHash[3] ^= D;
-	context->intermediateHash[4] ^= E;
-	context->intermediateHash[5] ^= F;
-	context->intermediateHash[6] ^= G;
-	context->intermediateHash[7] ^= H;
+	context->intermediateHash[0] ^= A;	context->intermediateHash[1] ^= B;
+	context->intermediateHash[2] ^= C;	context->intermediateHash[3] ^= D;
+	context->intermediateHash[4] ^= E;	context->intermediateHash[5] ^= F;
+	context->intermediateHash[6] ^= G;	context->intermediateHash[7] ^= H;
 }
 
 /*
